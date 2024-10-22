@@ -70,8 +70,33 @@ public class TeamBogosBinted {
 	// Note: you may change the return type of the method.
 	// You would need to provide your own function that prints your sorted array to
 	// a file in the exact same format that my program outputs
-	private static void sort(int [][] toSort) {
-		Arrays.sort(toSort, new SortingCompetitionComparator());
+	private static void sort(int[][] toSort) {
+		quicksort(toSort, 0, toSort.length - 1, new SortingCompetitionComparator());
+	}
+	
+	private static void quicksort(int[][] array, int low, int high, Comparator<int[]> comparator) {
+		if (low < high) {
+			int pivotIndex = partition(array, low, high, comparator);
+			quicksort(array, low, pivotIndex - 1, comparator);
+			quicksort(array, pivotIndex + 1, high, comparator);
+		}
+	}
+	
+	private static int partition(int[][] array, int low, int high, Comparator<int[]> comparator) {
+		int[] pivot = array[high];
+		int i = low - 1;
+		for (int j = low; j < high; j++) {
+			if (comparator.compare(array[j], pivot) <= 0) {
+				i++;
+				int[] temp = array[i];
+				array[i] = array[j];
+				array[j] = temp;
+			}
+		}
+		int[] temp = array[i + 1];
+		array[i + 1] = array[high];
+		array[high] = temp;
+		return i + 1;
 	}
 
 	private static class SortingCompetitionComparator implements Comparator<int []> {

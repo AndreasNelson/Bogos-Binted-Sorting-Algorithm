@@ -12,6 +12,9 @@ import java.util.List;
  * The length is between 3 and 9.
  */
 
+
+ // java DataGenerator input.txt 550000 0.003
+
 public class DataGenerator {
 	private static int seed = 4242; // change the seed to get different data
 	private static Random r = new Random(seed);

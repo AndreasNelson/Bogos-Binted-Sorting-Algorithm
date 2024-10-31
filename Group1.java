@@ -11,6 +11,8 @@ import java.util.Scanner;
 // To avoid file reading/writing connections to the server, run in /tmp 
 // of your lab machine.
 
+// to run for testing: java Group1 input.txt output.txt
+
 public class Group1 {
 
 	public static void main(String[] args) throws InterruptedException, FileNotFoundException {

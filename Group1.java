@@ -99,20 +99,38 @@ public class Group1 {
 	}
 	
 	private static int partition(int[][] array, int low, int high, Comparator<int[]> comparator) {
-		int[] pivot = array[high];
-		int i = low - 1;
-		for (int j = low; j < high; j++) {
+		// Get median-of-three pivot
+		int mid = low + (high - low) / 2;
+		medianOfThree(array, low, mid, high, comparator);
+		
+		// Place pivot at end for partitioning
+		swap(array, mid, high - 1);
+		int[] pivot = array[high - 1];
+		
+		int i = low;
+		for (int j = low; j < high - 1; j++) {
 			if (comparator.compare(array[j], pivot) <= 0) {
+				swap(array, i, j);
 				i++;
-				int[] temp = array[i];
-				array[i] = array[j];
-				array[j] = temp;
 			}
 		}
-		int[] temp = array[i + 1];
-		array[i + 1] = array[high];
-		array[high] = temp;
-		return i + 1;
+		swap(array, i, high - 1);
+		return i;
+	}
+	
+	private static void medianOfThree(int[][] array, int low, int mid, int high, Comparator<int[]> comparator) {
+		if (comparator.compare(array[mid], array[low]) < 0)
+			swap(array, low, mid);
+		if (comparator.compare(array[high], array[low]) < 0)
+			swap(array, low, high);
+		if (comparator.compare(array[high], array[mid]) < 0)
+			swap(array, mid, high);
+	}
+	
+	private static void swap(int[][] array, int i, int j) {
+		int[] temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
 	}
 	
 

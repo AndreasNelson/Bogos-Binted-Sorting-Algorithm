@@ -45,7 +45,7 @@ public class Group1 {
 
 		long end = System.currentTimeMillis();
 
-		System.out.println(end - start);
+		System.out.println(end - start + " ms");
 
 		writeOutResult(toSort, outFileName); // write out the results
 
@@ -78,9 +78,25 @@ public class Group1 {
 	
 	private static void quicksort(int[][] array, int low, int high, Comparator<int[]> comparator) {
 		if (low < high) {
-			int pivotIndex = partition(array, low, high, comparator);
-			quicksort(array, low, pivotIndex - 1, comparator);
-			quicksort(array, pivotIndex + 1, high, comparator);
+			if (high - low <= 20) {
+				insertionSort(array, low, high, comparator);
+			} else {
+				int pivotIndex = partition(array, low, high, comparator);
+				quicksort(array, low, pivotIndex - 1, comparator);
+				quicksort(array, pivotIndex + 1, high, comparator);
+			}
+		}
+	}
+	
+	private static void insertionSort(int[][] array, int low, int high, Comparator<int[]> comparator) {
+		for (int i = low + 1; i <= high; i++) {
+			int[] key = array[i];
+			int j = i - 1;
+			while (j >= low && comparator.compare(array[j], key) > 0) {
+				array[j + 1] = array[j];
+				j--;
+			}
+			array[j + 1] = key;
 		}
 	}
 	
@@ -100,6 +116,7 @@ public class Group1 {
 		array[high] = temp;
 		return i + 1;
 	}
+	
 
 	private static class SortingCompetitionComparator implements Comparator<int []> {
 		
@@ -205,5 +222,5 @@ public class Group1 {
 		out.close();
 	}
 	
-	
+	// java Group1 input.txt output.txt
 }

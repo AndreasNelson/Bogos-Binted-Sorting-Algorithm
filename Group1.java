@@ -79,21 +79,38 @@ public class Group1 {
 	private static void quicksort(int[][] array, int low, int high, Comparator<int[]> comparator) {
 		while (low < high) {
 			// Use insertion sort for small subarrays
-			if (high - low <= 16) {
+			if (high - low <= 10) {  // Reduced threshold for single-core
 				insertionSort(array, low, high, comparator);
 				return;
 			}
 			
-			// Partition and get pivot index
-			int pivotIndex = partition(array, low, high, comparator);
+			// Simple pivot selection - middle element to avoid stack overflow on sorted arrays
+			int mid = low + ((high - low) >> 1);
+			swap(array, mid, high);
+			int[] pivot = array[high];
 			
-			// Tail recursion elimination: recursively sort smaller partition
-			if (pivotIndex - low < high - pivotIndex) {
-				quicksort(array, low, pivotIndex - 1, comparator);
-				low = pivotIndex + 1;
+			// Optimized single-scan partition
+			int i = low - 1;
+			for (int j = low; j < high; j++) {
+				if (comparator.compare(array[j], pivot) <= 0) {
+					i++;
+					if (i != j) {
+						int[] temp = array[i];
+						array[i] = array[j];
+						array[j] = temp;
+					}
+				}
+			}
+			int pivotPos = i + 1;
+			array[high] = array[pivotPos];
+			array[pivotPos] = pivot;
+	
+			// Handle smaller partition first to minimize stack depth
+			if (pivotPos - low < high - pivotPos) {
+				quicksort(array, low, pivotPos - 1, comparator);
+				low = pivotPos + 1;
 			} else {
-				quicksort(array, pivotIndex + 1, high, comparator);
-				high = pivotIndex - 1;
+				quicksort(array, pivotPos + 1, high, comparator);				high = pivotPos - 1;
 			}
 		}
 	}
@@ -103,66 +120,21 @@ public class Group1 {
 			int[] key = array[i];
 			int j = i - 1;
 			
-			// Use binary search to find insertion point
-			int insertPoint = binarySearch(array, key, low, j, comparator);
-			
-			// Bulk array copy instead of individual swaps
-			System.arraycopy(array, insertPoint, array, insertPoint + 1, j - insertPoint + 1);
-			array[insertPoint] = key;
-		}
-	}
-	
-	private static int binarySearch(int[][] array, int[] key, int low, int high, Comparator<int[]> comparator) {
-		while (low <= high) {
-			int mid = (low + high) >>> 1;
-			if (comparator.compare(array[mid], key) <= 0) {
-				low = mid + 1;
-			} else {
-				high = mid - 1;
+			// Direct scanning is faster than binary search for small arrays on single core
+			while (j >= low && comparator.compare(array[j], key) > 0) {
+				array[j + 1] = array[j];
+				j--;
 			}
+			array[j + 1] = key;
 		}
-		return low;
-	}
-	
-	private static int partition(int[][] array, int low, int high, Comparator<int[]> comparator) {
-		// Median-of-three partitioning
-		int mid = low + (high - low) / 2;
-		int[] pivot;
-		
-		// Sort low, mid, high elements
-		if (comparator.compare(array[low], array[mid]) > 0) {
-			swap(array, low, mid);
-		}
-		if (comparator.compare(array[mid], array[high]) > 0) {
-			swap(array, mid, high);
-			if (comparator.compare(array[low], array[mid]) > 0) {
-				swap(array, low, mid);
-			}
-		}
-		
-		// Place pivot at high-1
-		swap(array, mid, high - 1);
-		pivot = array[high - 1];
-		
-		// Two-pointer partitioning
-		int i = low;
-		int j = high - 1;
-		while (true) {
-			while (comparator.compare(array[++i], pivot) < 0);
-			while (j > i && comparator.compare(array[--j], pivot) > 0);
-			if (i >= j) break;
-			swap(array, i, j);
-		}
-		
-		// Restore pivot
-		swap(array, i, high - 1);
-		return i;
 	}
 	
 	private static void swap(int[][] array, int i, int j) {
-		int[] temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
+		if (i != j) {
+			int[] temp = array[i];
+			array[i] = array[j];
+			array[j] = temp;
+		}
 	}
 	
 
